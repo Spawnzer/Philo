@@ -28,14 +28,11 @@ typedef	struct				s_philo
 	int						dead;
 	int						left;
 	int						right;
-	int						last_meal;
-	struct s_state			*state;
+	int						time_eaten;
+	long long						last_meal;
+	struct s_state					*state;
+	pthread_t					thread_id;
 }							t_philo;
-
-typedef	struct				s_fork
-{
-	int						clean;
-}							t_fork;
 
 typedef	struct				s_state
 {
@@ -43,15 +40,26 @@ typedef	struct				s_state
 	int						time_die;
 	int						time_eat;
 	int						time_sleep;
+	int						finished_eating;
 	int						n_to_eat;
 	int						rip;
-	int						start_time;
-	t_fork					fork_state;
-	pthread_mutex_t			console;
-	pthread_mutex_t			forks;
-	t_philo					*philo;
-}							t_state;
+	long long						start_time;
+	pthread_mutex_t					console;
+	pthread_mutex_t					forks[250];
+	pthread_mutex_t					waiter;
+	t_philo						philo[250];
+}					t_state;
 
+void    		ft_sleep(long long t, t_state *state);
+void    		ft_console(t_state *state, int id, char *str);
+long long    		ft_timestamp();
+void    		ft_finition(t_state *state, t_philo *philo);
+void    		ft_finition(t_state *state, t_philo *philo);
+long long    		ft_time_diff(long long past, long long present);
+void			*ft_action(void  *philosopher);
+int    			ft_can_eat(t_state *state, t_philo *philo);
+void    		ft_eat(t_state *state, t_philo *philo);
+int     		ft_routine(t_state *state);
 void			ft_putchar(int fd, char c);
 void			ft_exit_with_error(int fd, char *str);
 int				ft_atoi(char *str);

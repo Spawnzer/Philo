@@ -39,10 +39,34 @@ void	ft_init_philo(t_state *state)
 		state->philo[i].left = i;
 		state->philo[i].right = (i + 1) % state->nb_philos;
 		state->philo[i].last_meal = 0;
+		state->philo[i].time_eaten = 0;
 		state->philo[i].state = state;
 		i++;
 	}
 
+}
+int	ft_init_mutex(t_state *state)
+{
+	int i;
+	int ret;
+
+	i = 0;
+	while (i < state->nb_philos)
+	{
+		ret = pthread_mutex_init(&(state->forks[i]), NULL);
+			if (ret)
+				ft_exit_with_error(1, "Erreur de mutex @forks");
+	/*	state->fork[i]->fork_id = i;
+		state->fork[i]->clean = 1;
+	*/	i++;
+	}
+	ret = pthread_mutex_init(&(state->console), NULL);
+	if (ret)
+		ft_exit_with_error(1, "Erreur de mutex @console");
+	ret = pthread_mutex_init(&(state->waiter), NULL);
+	if (ret)
+		ft_exit_with_error(1, "Erreur de mutex @waiter");
+	return (0);
 }
 
 int main(int ac, char **av)
@@ -52,5 +76,7 @@ int main(int ac, char **av)
 		ft_exit_with_error(1, "Erreur, mauvais nombre d'argument");
 	ft_init_state(&state, ac, av);
 	ft_init_philo(&state);
+	ft_init_mutex(&state);
+	ft_routine(&state);
 	return (0);
 }

@@ -13,13 +13,16 @@
 NAME		= 	philo
 
 SRCS		= 	srcs/main.c \
-				srcs/utils.c
+				srcs/utils.c \
+				srcs/time.c \
+				srcs/routine.c
 
 OBJS		= $(SRCS:.c=.o)
 RM			= rm -rf
 EXEC		= gcc -o
 FLAGS		= -Wall -Werror -Wextra -c -g
-INCS		= ./includes
+INCS		= -lpthread
+INCS		+= ./includes
 CC			= gcc
 CP			= cp
 
