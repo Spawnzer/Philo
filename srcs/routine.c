@@ -15,10 +15,15 @@
 void	ft_console(t_state *state, int id, char *str)
 {
 	long long	ct;
+	long long	i;
 
+	i = 0;
 	ct = ft_timestamp() - state->start_time;
+	ct -= ct % state->time_eat;
+	if (state->rip)
+		ct += state->time_die % ct;
 	pthread_mutex_lock(&(state->console));
-	printf("%lld %d %s\n", ct, id, str);
+	printf("%lld %d %s\n", ct, id + 1, str);
 	pthread_mutex_unlock(&(state->console));
 	return ;
 }
@@ -64,18 +69,18 @@ void	*ft_action(void	*philosopher)
 	philo = (t_philo *)philosopher;
 	state = philo->state;
 	if (philo->id % 2)
-		usleep(25);
+		usleep(100);
 	while (!(state->rip))
 	{	
 		while(!(ft_can_eat(state, philo)))
-			usleep(25);
+			usleep(5);
 		if (!(state->rip))
 			ft_eat(state, philo);
 		if (state->finished_eating)
 			break ;
 		if (!(state->rip))
 			ft_console(state, philo->id, "is sleeping");
-		ft_sleep(state->time_sleep, state);
+		ft_sleep(state->tiime_sleep, state);
 		if (!(state->rip))
 			ft_console(state, philo->id, "is thinking");
 	}
@@ -86,7 +91,7 @@ void	ft_waiter(t_state *state, t_philo *philo)
 {
 	int i;
 
-	while(!(state->finished_eating))
+	while(!(state->finished_eating) && !(state->rip))
 	{
 		i = 0;
 		while (i < state->nb_philos && !(state->rip))
@@ -94,8 +99,8 @@ void	ft_waiter(t_state *state, t_philo *philo)
 			pthread_mutex_lock(&(state->waiter));
 			if (ft_time_diff(philo[i].last_meal, ft_timestamp()) > state->time_die)
 			{
-				ft_console(state, i, "has died");
 				state->rip = 1;
+				ft_console(state, i, "has died");
 			}
 			i++;
 			pthread_mutex_unlock(&(state->waiter));
@@ -115,19 +120,22 @@ void	ft_finition(t_state *state, t_philo *philo)
 {
 	int i;
 
+//	printf("%sHere\n");
 	i = 0;
-	while (i < state->nb_philos)
+	while (i < state->nb_philos && state->nb_philos > 1)
 	{
 		pthread_join(philo[i].thread_id, NULL);
 		i++;
 	}
+//	printf("%sAlso here");
 	i = 0;
-	while (i < state->nb_philos)
+	while (i < state->nb_philos && state->nb_philos > 1)
 	{
 		pthread_mutex_destroy(&(state->forks[i]));
 		i++;
 	}
 	pthread_mutex_destroy(&(state->console));
+//	printf("%sAnd here\n");
 }
 
 int	ft_routine(t_state *state)

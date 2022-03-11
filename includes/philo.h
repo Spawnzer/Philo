@@ -29,7 +29,7 @@ typedef	struct				s_philo
 	int						left;
 	int						right;
 	int						time_eaten;
-	long long						last_meal;
+	long long					last_meal;
 	struct s_state					*state;
 	pthread_t					thread_id;
 }							t_philo;
