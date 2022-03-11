@@ -19,9 +19,16 @@ void	ft_console(t_state *state, int id, char *str)
 
 	i = 0;
 	ct = ft_timestamp() - state->start_time;
-	ct -= ct % state->time_eat;
 	if (state->rip)
 		ct += state->time_die % ct;
+	if (str[3] == 'e')
+		ct -= ct % state->time_eat;
+	else if (str[3] == 's' || str[3] == 't')
+		ct -= ct % state->time_sleep;
+	else
+		ct -= ct % state->time_die;
+	/*if (state->rip)
+		ct += state->time_die % ct;*/
 	pthread_mutex_lock(&(state->console));
 	printf("%lld %d %s\n", ct, id + 1, str);
 	pthread_mutex_unlock(&(state->console));
@@ -80,7 +87,7 @@ void	*ft_action(void	*philosopher)
 			break ;
 		if (!(state->rip))
 			ft_console(state, philo->id, "is sleeping");
-		ft_sleep(state->tiime_sleep, state);
+		ft_sleep(state->time_sleep, state);
 		if (!(state->rip))
 			ft_console(state, philo->id, "is thinking");
 	}
